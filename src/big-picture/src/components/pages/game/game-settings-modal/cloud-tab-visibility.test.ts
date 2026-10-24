@@ -17,6 +17,17 @@ describe("Big Picture cloud save V2 tab visibility", () => {
     assert.equal(shouldShowCloudSaveV2Tab("steam", true, false), false);
   });
 
+  it("shows the V2 tab for self-hosted saves without an account", () => {
+    assert.equal(
+      shouldShowCloudSaveV2Tab("steam", false, false, null, true),
+      true
+    );
+    assert.equal(
+      shouldShowCloudSaveV2Tab("launchbox", false, false, null, true),
+      false
+    );
+  });
+
   it("shows V2 for eligible LaunchBox emulators only", () => {
     assert.equal(shouldShowCloudSaveV2Tab("launchbox", true, true), false);
     assert.equal(

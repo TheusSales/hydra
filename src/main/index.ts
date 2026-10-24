@@ -52,6 +52,7 @@ import {
   suspendEpicPlaytime,
   resumeEpicPlaytime,
 } from "./services/epic";
+import { CloudSaveRemotes } from "./services/cloud-save/remote/cloud-save-remote";
 
 crashReporter.start({
   uploadToServer: false,
@@ -451,6 +452,7 @@ app.on("before-quit", async (e) => {
 
 app.on("will-quit", () => {
   logger.info("Application will quit");
+  CloudSaveRemotes.stop();
 });
 
 app.on("activate", () => {

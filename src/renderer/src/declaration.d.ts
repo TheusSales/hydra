@@ -256,6 +256,10 @@ declare global {
       shop: GameShop,
       enabled: boolean
     ) => Promise<boolean>;
+    testRcloneCloudSaveConnection: (
+      remote: string,
+      binaryPath: string | null
+    ) => Promise<{ ok: true } | { ok: false; error: string }>;
     syncCloudSaveOnGamePage: (
       objectId: string,
       shop: GameShop

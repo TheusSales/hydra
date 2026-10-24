@@ -9,7 +9,12 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { getCloudSaveEmulatorProvider, isCloudSaveV2Eligible } from "@shared";
+import {
+  getCloudSaveAccessAction,
+  getCloudSaveEmulatorProvider,
+  isCloudSaveV2Eligible,
+  isSelfHostedCloudSaveConfigured,
+} from "@shared";
 
 import {
   getCloudSaveSyncErrorKind,
@@ -36,7 +41,11 @@ import type {
   Rpcs3DiscIdentityStatus,
 } from "@types";
 
-import { useBigPictureToast, useUserDetails } from "../../../../hooks";
+import {
+  useBigPictureToast,
+  useUserDetails,
+  useUserPreferences,
+} from "../../../../hooks";
 import { BigPictureCloudSaveConflictModal } from "./cloud-save-conflict-modal";
 import { BigPictureCloudSaveCustomPathModal } from "./cloud-save-custom-path-modal";
 import { BigPictureRetroArchBatteryModal } from "./cloud-save-retroarch-battery-modal";
@@ -170,7 +179,13 @@ export function BigPictureCloudSaveProvider({
   const { userDetails, hasActiveSubscription } = useUserDetails();
   const { showErrorToast, showSuccessToast, showWarningToast } =
     useBigPictureToast();
-  const canUseCloudSaves = Boolean(userDetails) && hasActiveSubscription;
+  const userPreferences = useUserPreferences();
+  const canUseCloudSaves =
+    getCloudSaveAccessAction(
+      Boolean(userDetails),
+      hasActiveSubscription,
+      isSelfHostedCloudSaveConfigured(userPreferences)
+    ) === "open";
   const eligible = isCloudSaveV2Eligible(shop, platform);
   const canCheckEmulator = eligible && canUseCloudSaves;
   const canCheckCloudSaves = canCheckEmulator && hasExecutablePath;

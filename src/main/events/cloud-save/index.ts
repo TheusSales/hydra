@@ -13,6 +13,7 @@ import "./resolve-cloud-save-conflict";
 import "./retroarch-local-battery";
 import "./select-game-backup-path";
 import "./set-cloud-save-automatic-sync-enabled";
+import "./test-rclone-cloud-save-connection";
 import "./upload-save-game";
 import "./select-cloud-save-custom-path";
 import "./rebind-cloud-save-custom-path";

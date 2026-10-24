@@ -1,0 +1,17 @@
+@use "../../scss/globals.scss";
+
+.settings-self-hosted-cloud-saves {
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: calc(globals.$spacing-unit * 2);
+  }
+
+  &__description {
+    margin: 0;
+  }
+
+  &__submit-button {
+    align-self: flex-start;
+  }
+}

@@ -1,5 +1,7 @@
 import { isAxiosError } from "axios";
 
+import { SelfHostedCloudSaveError } from "./remote/self-hosted-snapshot-store.js";
+
 export const isCloudSaveCommitTransportFailure = (error: unknown) =>
   (isAxiosError(error) && !error.response) ||
   (!isAxiosError(error) &&
@@ -15,6 +17,12 @@ export const shouldReprepareCloudSaveSnapshot = (error: unknown) => {
   ) {
     return true;
   }
+  if (error instanceof SelfHostedCloudSaveError) {
+    return [
+      "game/cloud-save-pending-snapshot-incomplete",
+      "game/cloud-save-pending-snapshot-not-found",
+    ].includes(error.code);
+  }
   if (!isAxiosError(error)) return false;
   const payload = JSON.stringify(error.response?.data ?? "");
   return (
@@ -25,7 +33,9 @@ export const shouldReprepareCloudSaveSnapshot = (error: unknown) => {
 };
 
 export const shouldRetryCloudSaveConflict = (error: unknown, attempt: number) =>
-  attempt === 0 && isAxiosError(error) && error.response?.status === 409;
+  attempt === 0 &&
+  ((isAxiosError(error) && error.response?.status === 409) ||
+    (error instanceof SelfHostedCloudSaveError && error.status === 409));
 
 export const shouldRetryCloudSaveStateChange = (attempt: number) =>
   attempt === 0;

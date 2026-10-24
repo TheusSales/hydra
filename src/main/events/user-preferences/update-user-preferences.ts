@@ -19,6 +19,7 @@ import {
   resolveEmulatorAchievementTracking,
 } from "@main/services/emulators/emulator-achievement-tracking";
 import { HydraApi } from "@main/services/hydra-api";
+import { CloudSaveRemotes } from "@main/services/cloud-save/remote/cloud-save-remote";
 import { deleteRetroAchievementsEmulatorAccount } from "@main/services/retro-achievements/retro-achievements-emulator-account";
 import {
   prepareLinuxGameCaptureSession,
@@ -197,6 +198,7 @@ const updateUserPreferences = async (
   );
 
   Wine.syncUserPreferences(updatedPreferences);
+  CloudSaveRemotes.syncUserPreferences(updatedPreferences);
 
   await updateEmulatorAchievementTracking(preferences, updatedPreferences);
   await unlinkRetroAchievementsEmulatorAccount(preferences);

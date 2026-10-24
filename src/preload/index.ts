@@ -350,6 +350,12 @@ contextBridge.exposeInMainWorld("electron", {
       shop,
       enabled
     ) as Promise<boolean>,
+  testRcloneCloudSaveConnection: (remote: string, binaryPath: string | null) =>
+    ipcRenderer.invoke(
+      "testRcloneCloudSaveConnection",
+      remote,
+      binaryPath
+    ) as Promise<{ ok: true } | { ok: false; error: string }>,
   syncCloudSaveOnGamePage: (objectId: string, shop: GameShop) =>
     ipcRenderer.invoke(
       "syncCloudSaveOnGamePage",

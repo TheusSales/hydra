@@ -16,10 +16,11 @@ import {
   getCloudSaveEmulatorProvider,
   hasCloudSaveExecutableSelection,
   isCloudSaveV2Eligible,
+  isSelfHostedCloudSaveConfigured,
 } from "@shared";
 import { Button, ConfirmationModal, Modal } from "@renderer/components";
 import { gameDetailsContext } from "@renderer/context";
-import { useToast, useUserDetails } from "@renderer/hooks";
+import { useAppSelector, useToast, useUserDetails } from "@renderer/hooks";
 import { useSubscription } from "@renderer/hooks/use-subscription";
 import type {
   CloudSaveConflictResolution,
@@ -188,9 +189,13 @@ export function CloudSaveV2Provider({
     setShowGameOptionsModal,
     setGameOptionsInitialCategory,
   } = useContext(gameDetailsContext);
+  const userPreferences = useAppSelector(
+    (state) => state.userPreferences.value
+  );
   const cloudSaveAccessAction = getCloudSaveAccessAction(
     Boolean(userDetails),
-    hasActiveSubscription
+    hasActiveSubscription,
+    isSelfHostedCloudSaveConfigured(userPreferences)
   );
   const canUseCloudSaves = cloudSaveAccessAction === "open";
   const isV2Eligible = isCloudSaveV2Eligible(shop, game?.platform);

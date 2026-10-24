@@ -1,4 +1,3 @@
-import { HydraApi } from "@main/services/hydra-api";
 import { logger } from "@main/services/logger";
 import { SystemPath } from "@main/services/system-path";
 import { Wine } from "@main/services/wine";
@@ -26,6 +25,7 @@ import { isEmulatorSaveRawPath } from "./emulator-provider-identity";
 import { buildCloudSaveAggregateHash } from "./snapshot-aggregate-hash";
 import { blockAmbiguousRestoreTargets } from "./restore-target-collision";
 import { filterUnsafeEmulatorRestoreTargets } from "./emulator-restore-plan";
+import { CloudSaveRemotes } from "./remote/cloud-save-remote";
 
 const isWinePrefixValid = (winePrefixPath?: string) => {
   if (!winePrefixPath) return false;
@@ -40,11 +40,7 @@ export const getRemoteSnapshotRestoreManifest = async (
   snapshot: RemoteSnapshotSummary | RemoteGameSnapshot
 ): Promise<RestoreManifestResponse> => {
   const manifest = validateRestoreManifest(
-    await HydraApi.get<unknown>(
-      "/profile/cloud-saves/snapshot-restore-manifest",
-      { snapshotId: snapshot.id },
-      { needsAuth: true, needsSubscription: true }
-    )
+    await CloudSaveRemotes.current().getRestoreManifest(snapshot.id)
   );
   const totalSizeBytes = manifest.files.reduce(
     (total, file) => total + file.sizeBytes,

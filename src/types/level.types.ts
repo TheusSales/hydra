@@ -245,6 +245,10 @@ export interface UserPreferences {
   hideLibraryAchievementProgress?: boolean;
   autoplayAnimatedArtwork?: boolean;
   persistFiltersAndSorting?: boolean;
+  cloudSaveBackend?: "hydra" | "rclone";
+  /** rclone remote and optional root for self-hosted saves, e.g. `vps:hydra-saves`. */
+  rcloneCloudSaveRemote?: string | null;
+  rcloneBinaryPath?: string | null;
 }
 
 export interface NetworkInterface {

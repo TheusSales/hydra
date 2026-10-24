@@ -1,6 +1,5 @@
 import os from "node:os";
 
-import { HydraApi } from "@main/services/hydra-api";
 import type {
   CloudSaveUploadProgress,
   GameShop,
@@ -14,6 +13,7 @@ import { NativeAddon } from "../native-addon";
 import { buildLocalGameSnapshotContext } from "./build-local-game-snapshot";
 import { cloudSaveFileKey } from "./cloud-save-contract";
 import { buildPrepareSnapshotPayload } from "./prepare-snapshot-payload";
+import { CloudSaveRemotes } from "./remote/cloud-save-remote";
 import {
   groupUploadsByHash,
   validatePrepareResponse,
@@ -62,8 +62,7 @@ export const uploadLocalGameSnapshot = async (
   assertCloudSaveUploadWithinLimits(proposalFiles);
 
   const response = validatePrepareResponse(
-    await HydraApi.post<unknown>(
-      "/profile/cloud-saves/prepare-snapshot",
+    await CloudSaveRemotes.current().prepareSnapshot(
       buildPrepareSnapshotPayload({
         shop,
         objectId,
@@ -75,8 +74,7 @@ export const uploadLocalGameSnapshot = async (
         customPathRawPaths: proposalCustomPathRawPaths,
         variants: proposalVariants,
         files: proposalFiles,
-      }),
-      { needsAuth: true, needsSubscription: true }
+      })
     )
   );
   if (response.snapshotHash !== aggregateHash) {

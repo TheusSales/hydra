@@ -3,7 +3,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SidebarModal, type SidebarModalTab } from "../../../common";
 import { resolvePreferredGameAssets } from "../../../../helpers";
+import { isSelfHostedCloudSaveConfigured } from "@shared";
 import { useUserDetails } from "../../../../hooks/use-user-details.hook";
+import { useUserPreferences } from "../../../../hooks/use-user-preferences.hook";
 
 import "./styles.scss";
 import {
@@ -83,6 +85,7 @@ export function GameSettingsModal({
   const { t } = useTranslation(["game_details", "header"]);
   const [activeTabId, setActiveTabId] = useState<GameSettingsTabId>("launch");
   const { userDetails, hasActiveSubscription } = useUserDetails();
+  const userPreferences = useUserPreferences();
   const preferredAssets = useMemo(
     () => resolvePreferredGameAssets(game, null),
     [game]
@@ -146,7 +149,8 @@ export function GameSettingsModal({
     game.shop,
     isSignedIn,
     hasActiveSubscription,
-    game.platform
+    game.platform,
+    isSelfHostedCloudSaveConfigured(userPreferences)
   );
   const shouldShowLegacyCloudTab = shouldShowLegacyCloudSaveTab(
     game.shop,

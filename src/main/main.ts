@@ -38,6 +38,7 @@ import { migrateDownloadSources } from "./helpers/migrate-download-sources";
 import { getDirSize } from "./services/download/helpers";
 import { isDebridPendingError } from "./services/download/debrid-files";
 import { GofileApi } from "./services/hosters";
+import { CloudSaveRemotes } from "./services/cloud-save/remote/cloud-save-remote";
 import { clearLegacyAchievementPersistence } from "./level/clear-legacy-achievements";
 import { startSteamSyncOnStartup } from "./services/steam-integration/steam-startup-sync";
 import { migrateEmulatorCloudSaveDefaults } from "./services/cloud-save/automatic-sync-emulator-migration";
@@ -82,6 +83,7 @@ export const loadState = async () => {
   );
 
   Wine.syncUserPreferences(userPreferences);
+  CloudSaveRemotes.syncUserPreferences(userPreferences);
 
   await import("./events");
 

@@ -19,6 +19,8 @@ export const shouldShowCloudSaveV2Tab = (
   shop: GameShop,
   isSignedIn: boolean,
   hasActiveSubscription: boolean,
-  platform?: string | null
+  platform?: string | null,
+  isSelfHosted = false
 ) =>
-  isCloudSaveV2Eligible(shop, platform) && isSignedIn && hasActiveSubscription;
+  isCloudSaveV2Eligible(shop, platform) &&
+  (isSelfHosted || (isSignedIn && hasActiveSubscription));
