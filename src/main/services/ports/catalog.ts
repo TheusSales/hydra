@@ -1,10 +1,16 @@
 import type { PcPortKind } from "@types";
 
-export interface PcPortAsset {
+export type PcPortAsset = {
   /** Matched against the asset names of the latest GitHub release. */
   pattern: RegExp;
-  type: "appimage";
-}
+} & (
+  | { type: "appimage" }
+  | {
+      type: "zip";
+      /** Executable names to look for in the extracted archive, preferred first. */
+      executables: string[];
+    }
+);
 
 export interface PcPortDefinition {
   id: string;
@@ -55,6 +61,13 @@ export const pcPortCatalog: PcPortDefinition[] = [
       linux: {
         pattern: /^(?:spartanport|gow3)-x86_64\.AppImage$/,
         type: "appimage",
+      },
+      // The zip holds spartanport-windows/ with the launcher, which takes --play
+      // and SPARTAN_DATA_DIR like the AppImage.
+      win32: {
+        pattern: /^(?:spartanport|gow3)-windows\.zip$/,
+        type: "zip",
+        executables: ["SpartanPort.exe", "God of War III.exe"],
       },
     },
     gameData: {

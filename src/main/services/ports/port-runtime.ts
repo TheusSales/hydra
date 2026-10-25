@@ -1,3 +1,6 @@
+import fs from "node:fs/promises";
+import path from "node:path";
+
 import type { PcPortDefinition } from "./catalog.js";
 
 /**
@@ -66,11 +69,54 @@ export const selectPcPortReleaseAsset = (
   if (!asset) return null;
   const checksum =
     assets.find(({ name }) => name === `${asset.name}.sha256`) ?? null;
-  return { asset, checksum, type: spec.type };
+  return { asset, checksum, spec };
 };
 
 /** Reads `sha256sum`-style sidecars: `<hash>  <file name>` or a bare hash. */
 export const parseSha256Sidecar = (text: string) => {
   const match = /^\s*([a-fA-F0-9]{64})\b/.exec(text);
   return match ? match[1].toLowerCase() : null;
+};
+
+/** Release tags carry the build's platform (`windows-v2.7.0`); show the version. */
+export const pcPortVersionFromTag = (tag: string) =>
+  tag.replace(/^[a-z][a-z0-9]*-(?=v?\d)/i, "");
+
+/**
+ * Finds the port's executable in an extracted archive: at its root or in the
+ * single top-level folder release zips usually wrap everything in.
+ */
+export const findPcPortExecutable = async (
+  root: string,
+  executables: string[]
+) => {
+  const entries = await fs.readdir(root, { withFileTypes: true });
+  const folders = [
+    root,
+    ...entries
+      .filter((entry) => entry.isDirectory())
+      .map((entry) => path.join(root, entry.name)),
+  ];
+  for (const name of executables) {
+    for (const folder of folders) {
+      const candidate = path.join(folder, name);
+      const stat = await fs.stat(candidate).catch(() => null);
+      if (stat?.isFile()) return candidate;
+    }
+  }
+  return null;
+};
+
+/**
+ * Finds a save location another machine already uploaded for this port, so a
+ * save made on Windows restores on Linux and vice versa: the custom path
+ * encoding differs per platform, but the port's data layout does not.
+ */
+export const findRemotePcPortSavePath = (
+  port: PcPortDefinition,
+  savePath: string,
+  remoteRawPaths: string[]
+) => {
+  const suffix = `/ports/${port.id}/data/${savePath}`;
+  return remoteRawPaths.find((rawPath) => rawPath.endsWith(suffix)) ?? null;
 };

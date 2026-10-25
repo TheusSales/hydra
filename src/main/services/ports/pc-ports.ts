@@ -13,18 +13,29 @@ import { WindowManager } from "@main/services/window-manager";
 import { PC_PORT_PLATFORM, pcPortObjectId } from "@shared";
 import type { Game, PcPortInstallProgress, PcPortSummary } from "@types";
 
+import { validateRestoreManifest } from "../cloud-save/cloud-save-contract";
 import {
+  bindCloudSaveCustomPathToLocalPath,
   encodeCloudSaveCustomPath,
   getCurrentCloudSaveCustomPathContext,
 } from "../cloud-save/custom-path";
-import { registerCloudSaveCustomPaths } from "../cloud-save/custom-path-store";
+import {
+  registerCloudSaveCustomPaths,
+  removeCloudSaveCustomPathBinding,
+} from "../cloud-save/custom-path-store";
+import { listRemoteGameSnapshots } from "../cloud-save/list-remote-game-snapshots";
+import { CloudSaveRemotes } from "../cloud-save/remote/cloud-save-remote";
+import { SevenZip } from "../7zip";
 import { downloadToFile, removeFileQuietly } from "../download-to-file";
 import { findPcPort, pcPortCatalog, type PcPortDefinition } from "./catalog";
 import { validatePcPortGameData } from "./port-game-data";
 import {
   buildPcPortLaunchOptions,
+  findPcPortExecutable,
+  findRemotePcPortSavePath,
   mergePcPortSettings,
   parseSha256Sidecar,
+  pcPortVersionFromTag,
   selectPcPortReleaseAsset,
   type GithubReleaseAsset,
 } from "./port-runtime";
@@ -101,6 +112,78 @@ const copyArtwork = async (
   return `local:${to}`;
 };
 
+/** Custom path raw paths of the port's current remote snapshot, if any. */
+const getRemoteSavePathRawPaths = async (objectId: string) => {
+  try {
+    const [snapshot] = await listRemoteGameSnapshots(objectId, "custom");
+    if (!snapshot) return [];
+    const manifest = validateRestoreManifest(
+      await CloudSaveRemotes.current().getRestoreManifest(snapshot.id)
+    );
+    return manifest.customPathRawPaths;
+  } catch (error) {
+    logger.warn(
+      `[PC ports] remote save paths unavailable for ${objectId}`,
+      error
+    );
+    return [];
+  }
+};
+
+/**
+ * Tracks the port's save folders with Cloud Save. A folder another machine
+ * already uploaded (possibly from another OS) is bound to the local folder
+ * under its existing raw path; otherwise the local encoding is registered and
+ * stays pending until the first upload confirms it.
+ */
+const registerPcPortSavePaths = async (
+  port: PcPortDefinition,
+  objectId: string,
+  portDataDir: string
+) => {
+  const context = getCurrentCloudSaveCustomPathContext();
+  const remoteRawPaths = await getRemoteSavePathRawPaths(objectId);
+
+  for (const savePath of port.savePaths) {
+    const absolute = path.join(portDataDir, ...savePath.split("/"));
+    await fs.mkdir(absolute, { recursive: true });
+    const local = {
+      ...encodeCloudSaveCustomPath(absolute, context),
+      kind: "dir" as const,
+    };
+    const remoteRawPath = findRemotePcPortSavePath(
+      port,
+      savePath,
+      remoteRawPaths
+    );
+
+    if (remoteRawPath && remoteRawPath !== local.rawPath) {
+      // One folder must not be tracked under two raw paths.
+      await removeCloudSaveCustomPathBinding("custom", objectId, local.rawPath);
+      await registerCloudSaveCustomPaths(
+        "custom",
+        objectId,
+        [
+          {
+            ...bindCloudSaveCustomPathToLocalPath(
+              remoteRawPath,
+              absolute,
+              context
+            ),
+            kind: "dir",
+          },
+        ],
+        { context, syncState: "confirmed" }
+      );
+    } else {
+      await registerCloudSaveCustomPaths("custom", objectId, [local], {
+        context,
+        syncState: remoteRawPath ? "confirmed" : "pending",
+      });
+    }
+  }
+};
+
 export class PcPorts {
   static async list(): Promise<PcPortSummary[]> {
     return Promise.all(
@@ -148,8 +231,10 @@ export class PcPorts {
     if (!selected) throw new Error("pc_port_no_build_for_platform");
 
     const binDir = path.join(portRoot(portId), "bin");
-    const destination = path.join(binDir, selected.asset.name);
-    const partial = `${destination}.part`;
+    const download = path.join(binDir, selected.asset.name);
+    const partial = `${download}.part`;
+    let binaryPath: string;
+    let keep: string;
     try {
       await downloadToFile(
         selected.asset.browser_download_url,
@@ -171,24 +256,52 @@ export class PcPorts {
         logger.warn(`[PC ports] ${portId} release has no .sha256 sidecar`);
       }
 
-      await fs.rename(partial, destination);
-      await fs.chmod(destination, 0o755);
+      if (selected.spec.type === "zip") {
+        // A fresh folder per release: the running build is never overwritten.
+        keep = `${path.basename(download, ".zip")}-${release.tag_name}`.replace(
+          /[^A-Za-z0-9._-]/g,
+          "_"
+        );
+        const extractDir = path.join(binDir, keep);
+        await fs.rm(extractDir, { force: true, recursive: true });
+        await SevenZip.extractFile({
+          filePath: partial,
+          outputPath: extractDir,
+        });
+        await removeFileQuietly(partial);
+        const executable = await findPcPortExecutable(
+          extractDir,
+          selected.spec.executables
+        );
+        if (!executable) throw new Error("pc_port_executable_not_found");
+        binaryPath = executable;
+      } else {
+        await fs.rename(partial, download);
+        await fs.chmod(download, 0o755);
+        keep = selected.asset.name;
+        binaryPath = download;
+      }
     } catch (error) {
       await removeFileQuietly(partial);
       throw error;
     }
 
     for (const entry of await fs.readdir(binDir)) {
-      if (entry !== selected.asset.name) {
-        await fs.rm(path.join(binDir, entry), { force: true, recursive: true });
-      }
+      if (entry === keep) continue;
+      // An older build still running (Windows locks it) is removed next time.
+      await fs
+        .rm(path.join(binDir, entry), { force: true, recursive: true })
+        .catch((error) =>
+          logger.warn(`[PC ports] could not remove old build ${entry}`, error)
+        );
     }
 
     const previous = await readState(portId);
+    const version = pcPortVersionFromTag(release.tag_name);
     await writeJsonAtomic(statePath(portId), {
       ...previous,
-      version: release.tag_name,
-      binaryPath: destination,
+      version,
+      binaryPath,
     } satisfies PcPortState);
 
     // A configured game keeps working after an update: point it at the new build.
@@ -200,7 +313,7 @@ export class PcPorts {
       );
     }
 
-    return release.tag_name;
+    return version;
   }
 
   /**
@@ -282,22 +395,7 @@ export class PcPorts {
     };
     await gamesSublevel.put(key, game);
 
-    const context = getCurrentCloudSaveCustomPathContext();
-    const customPaths = await Promise.all(
-      port.savePaths.map(async (savePath) => {
-        const absolute = path.join(portDataDir, ...savePath.split("/"));
-        await fs.mkdir(absolute, { recursive: true });
-        return {
-          ...encodeCloudSaveCustomPath(absolute, context),
-          kind: "dir" as const,
-        };
-      })
-    );
-    // Pending until the first upload confirms them on the remote snapshot.
-    await registerCloudSaveCustomPaths("custom", objectId, customPaths, {
-      context,
-      syncState: "pending",
-    });
+    await registerPcPortSavePaths(port, objectId, portDataDir);
 
     WindowManager.sendToAppWindows("on-library-batch-complete");
     return game;

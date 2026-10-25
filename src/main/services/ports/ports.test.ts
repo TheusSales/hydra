@@ -16,8 +16,11 @@ import {
 // @ts-ignore The Node ESM test runner requires the source extension.
 import {
   buildPcPortLaunchOptions,
+  findPcPortExecutable,
+  findRemotePcPortSavePath,
   mergePcPortSettings,
   parseSha256Sidecar,
+  pcPortVersionFromTag,
   selectPcPortReleaseAsset,
 } from "./port-runtime.ts";
 
@@ -165,5 +168,68 @@ describe("PC port runtime helpers", () => {
       hash.toLowerCase()
     );
     assert.equal(parseSha256Sidecar("not a hash"), null);
+  });
+
+  it("picks the Windows zip and its checksum", () => {
+    const asset = (name: string) => ({
+      name,
+      browser_download_url: `https://example.com/${name}`,
+      size: 1,
+    });
+    const selected = selectPcPortReleaseAsset(port, "win32", [
+      asset("spartanport-x86_64.AppImage"),
+      asset("spartanport-windows.zip"),
+      asset("spartanport-windows.zip.sha256"),
+    ]);
+    assert.equal(selected?.asset.name, "spartanport-windows.zip");
+    assert.equal(selected?.spec.type, "zip");
+    assert.equal(selected?.checksum?.name, "spartanport-windows.zip.sha256");
+  });
+
+  it("reads sidecars written in binary mode", () => {
+    const hash = "b".repeat(64);
+    assert.equal(parseSha256Sidecar(`${hash} *spartanport-windows.zip`), hash);
+  });
+
+  it("shows the version without the release tag's platform prefix", () => {
+    assert.equal(pcPortVersionFromTag("windows-v2.7.0"), "v2.7.0");
+    assert.equal(pcPortVersionFromTag("v1.4.0"), "v1.4.0");
+    assert.equal(pcPortVersionFromTag("2.0.1"), "2.0.1");
+  });
+
+  it("finds the launcher inside the zip's top-level folder, preferred name first", async () => {
+    const root = await fs.mkdtemp(path.join(os.tmpdir(), "hydra-port-zip-"));
+    roots.push(root);
+    const folder = path.join(root, "spartanport-windows");
+    await fs.mkdir(folder);
+    await fs.writeFile(path.join(folder, "God of War III.exe"), "");
+    await fs.writeFile(path.join(folder, "SpartanPort.exe"), "");
+
+    assert.equal(
+      await findPcPortExecutable(root, [
+        "SpartanPort.exe",
+        "God of War III.exe",
+      ]),
+      path.join(folder, "SpartanPort.exe")
+    );
+    assert.equal(await findPcPortExecutable(root, ["Missing.exe"]), null);
+  });
+
+  it("adopts a save folder uploaded from another operating system", () => {
+    const windows =
+      "<custom><windows><winAppData>/hydralauncher/ports/spartanport/data/user/savedata";
+    assert.equal(
+      findRemotePcPortSavePath(port, "user/savedata", [
+        "<custom><linux><home>/other/save",
+        windows,
+      ]),
+      windows
+    );
+    assert.equal(
+      findRemotePcPortSavePath(port, "user/savedata", [
+        "<custom><linux><home>/ports/another/data/user/savedata",
+      ]),
+      null
+    );
   });
 });
