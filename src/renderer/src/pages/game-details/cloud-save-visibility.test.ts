@@ -91,6 +91,17 @@ describe("cloud save visibility", () => {
     });
   });
 
+  it("uses V2 only for custom games installed from the PC port catalog", () => {
+    assert.deepEqual(getCloudSaveVisibility("custom", "PC Port"), {
+      hero: "v2",
+      settings: {
+        showV2: true,
+        showLegacy: false,
+        legacyPurpose: "archive",
+      },
+    });
+  });
+
   it("shows active legacy settings without requiring existing artifacts", () => {
     const settings = getCloudSaveVisibility("launchbox").settings;
 

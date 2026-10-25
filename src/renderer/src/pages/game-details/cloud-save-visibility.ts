@@ -1,5 +1,6 @@
 import type { GameShop } from "@types";
 import { getCloudSaveEmulatorProvider } from "../../../../shared/cloud-save-emulator-provider.js";
+import { isPcPortGame } from "../../../../shared/pc-ports.js";
 
 export type CloudSaveUiMode = "legacy" | "v2";
 export type LegacyCloudSavePurpose = "active" | "archive";
@@ -39,7 +40,7 @@ export const getCloudSaveVisibility = (
     };
   }
 
-  if (shop === "epic") {
+  if (shop === "epic" || isPcPortGame(shop, platform)) {
     return {
       hero: "v2",
       settings: {

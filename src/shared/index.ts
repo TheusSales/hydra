@@ -38,6 +38,7 @@ export {
 } from "./playtime";
 export * from "./cloud-save-access";
 export * from "./cloud-save-emulator-provider";
+export * from "./pc-ports";
 export * from "./profile-friends";
 export * from "./classics-disc-label";
 export * from "./controller-support";

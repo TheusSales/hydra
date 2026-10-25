@@ -30,6 +30,8 @@ import type {
   EmulatorSystem,
   EmulatorBinary,
   EmulatorInstallProgress,
+  PcPortInstallProgress,
+  PcPortSummary,
   RetroArchCoreName,
   RetroArchCoreInstallProgress,
   RetroArchInstallProgress,
@@ -628,6 +630,31 @@ contextBridge.exposeInMainWorld("electron", {
     ipcRenderer.on("on-emulator-install-progress", listener);
     return () =>
       ipcRenderer.removeListener("on-emulator-install-progress", listener);
+  },
+  /* PC ports */
+  listPcPorts: () =>
+    ipcRenderer.invoke("listPcPorts") as Promise<PcPortSummary[]>,
+  installPcPort: (portId: string) =>
+    ipcRenderer.invoke("installPcPort", portId) as Promise<
+      { ok: true; value: string } | { ok: false; error: string }
+    >,
+  configurePcPort: (
+    portId: string,
+    gameDir: string,
+    updateDir: string | null
+  ) =>
+    ipcRenderer.invoke(
+      "configurePcPort",
+      portId,
+      gameDir,
+      updateDir
+    ) as Promise<{ ok: true } | { ok: false; error: string }>,
+  onPcPortInstallProgress: (cb: (payload: PcPortInstallProgress) => void) => {
+    const listener = (_event: unknown, payload: PcPortInstallProgress) =>
+      cb(payload);
+    ipcRenderer.on("on-pc-port-install-progress", listener);
+    return () =>
+      ipcRenderer.removeListener("on-pc-port-install-progress", listener);
   },
   /* RetroArch */
   getRetroArchConfig: () => ipcRenderer.invoke("getRetroArchConfig"),

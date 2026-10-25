@@ -54,6 +54,8 @@ import type {
   EmulationBackupProgress,
   EmulatorBinary,
   EmulatorInstallProgress,
+  PcPortInstallProgress,
+  PcPortSummary,
   EmulatorInstallResult,
   ResolvedInstallOption,
   DetectedRom,
@@ -754,6 +756,19 @@ declare global {
     ) => Promise<EmulatorInstallResult>;
     onEmulatorInstallProgress: (
       cb: (payload: EmulatorInstallProgress) => void
+    ) => () => void;
+    /* PC ports */
+    listPcPorts: () => Promise<PcPortSummary[]>;
+    installPcPort: (
+      portId: string
+    ) => Promise<{ ok: true; value: string } | { ok: false; error: string }>;
+    configurePcPort: (
+      portId: string,
+      gameDir: string,
+      updateDir: string | null
+    ) => Promise<{ ok: true } | { ok: false; error: string }>;
+    onPcPortInstallProgress: (
+      cb: (payload: PcPortInstallProgress) => void
     ) => () => void;
     /* RetroArch */
     getRetroArchConfig: () => Promise<RetroArchConfig>;

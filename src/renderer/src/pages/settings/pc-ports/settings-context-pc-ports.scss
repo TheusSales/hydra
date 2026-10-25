@@ -1,0 +1,53 @@
+@use "../../../scss/globals.scss";
+
+.settings-pc-ports {
+  display: flex;
+  flex-direction: column;
+  gap: calc(globals.$spacing-unit * 3);
+
+  &__description,
+  &__hint {
+    margin: 0;
+    color: globals.$body-color;
+    line-height: 1.5;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: calc(globals.$spacing-unit * 2);
+    padding: calc(globals.$spacing-unit * 2);
+    border: solid 1px globals.$border-color;
+    border-radius: 8px;
+    background-color: globals.$dark-background-color;
+  }
+
+  &__card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: calc(globals.$spacing-unit * 2);
+  }
+
+  &__card-title {
+    margin: 0;
+  }
+
+  &__card-meta {
+    margin: calc(globals.$spacing-unit / 2) 0 0;
+    color: globals.$body-color;
+    font-size: globals.$small-font-size;
+  }
+
+  &__source {
+    display: flex;
+    align-items: center;
+    gap: globals.$spacing-unit;
+    flex-shrink: 0;
+  }
+
+  &__install,
+  &__save {
+    align-self: flex-start;
+  }
+}

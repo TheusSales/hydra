@@ -15,6 +15,13 @@ it("offers V2 for Epic catalogue games without exposing emulator file selection"
   assert.equal(canSelectCloudSaveCustomFile("epic"), false);
 });
 
+it("offers V2 for custom games installed from the PC port catalog", () => {
+  assert.equal(isCloudSaveV2Eligible("custom", "PC Port"), true);
+  assert.equal(isCloudSaveV2Eligible("custom", "Windows"), false);
+  assert.equal(isCloudSaveV2Eligible("launchbox", "PC Port"), false);
+  assert.equal(canSelectCloudSaveCustomFile("custom", "PC Port"), false);
+});
+
 it("recognizes legacy custom save files only for LaunchBox emulator V2 games", () => {
   assert.equal(canSelectCloudSaveCustomFile("steam"), false);
   assert.equal(canSelectCloudSaveCustomFile("steam", "Super Nintendo"), false);

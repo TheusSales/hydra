@@ -17,7 +17,7 @@ import {
   VideoIcon,
   ShieldCheckIcon,
 } from "@primer/octicons-react";
-import { Gamepad2, Wrench } from "lucide-react";
+import { Cpu, Gamepad2, Wrench } from "lucide-react";
 import { SettingsContextGeneral } from "./settings-context-general";
 import { SettingsContextDownloads } from "./settings-context-downloads";
 import { SettingsContextDownloadSources } from "./settings-context-download-sources";
@@ -27,6 +27,7 @@ import { SettingsContextIntegrations } from "./settings-context-integrations";
 import { SettingsContextCompatibility } from "./settings-context-compatibility";
 import { SettingsContextBigPicture } from "./settings-context-big-picture";
 import { SettingsContextEmulation } from "./emulation/settings-context-emulation";
+import { SettingsContextPcPorts } from "./pc-ports/settings-context-pc-ports";
 
 export default function Settings() {
   const { t } = useTranslation("settings");
@@ -90,6 +91,12 @@ export default function Settings() {
         icon: <Gamepad2 size={16} />,
         group: "classics" as const,
       },
+      {
+        id: "pc_ports" as const,
+        label: t("pc_ports"),
+        icon: <Cpu size={16} />,
+        group: "classics" as const,
+      },
     ],
     [t, userDetails]
   );
@@ -138,6 +145,10 @@ export default function Settings() {
 
             if (selectedCategoryId === "emulation") {
               return <SettingsContextEmulation />;
+            }
+
+            if (selectedCategoryId === "pc_ports") {
+              return <SettingsContextPcPorts />;
             }
 
             return <SettingsAccount />;

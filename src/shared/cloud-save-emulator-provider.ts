@@ -1,5 +1,6 @@
 import type { GameShop, RetroArchPlatform } from "@types";
 
+import { isPcPortGame } from "./pc-ports.js";
 import { platformToRetroArchPlatform } from "./retroarch-platform.js";
 
 export type CloudSaveEmulatorProvider = "rpcs3" | "retroarch";
@@ -61,4 +62,5 @@ export const isCloudSaveV2Eligible = (
 ) =>
   shop === "steam" ||
   shop === "epic" ||
+  isPcPortGame(shop, platform) ||
   getCloudSaveEmulatorProvider(shop, platform) !== null;

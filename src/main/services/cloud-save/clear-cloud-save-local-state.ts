@@ -5,17 +5,13 @@ import {
   db,
   levelKeys,
 } from "@main/level";
-import type { GameShop, User } from "@types";
+import type { GameShop } from "@types";
 
 import { isCloudSaveSyncAnchorKeyForGame } from "./sync-anchor-key";
+import { getCloudSaveLocalUserId } from "./local-user-id";
 
-const getCurrentUserId = async () => {
-  const user = await db.get<string, User>(levelKeys.user, {
-    valueEncoding: "json",
-  });
-  if (!user?.id) throw new Error("Cloud save deletion requires a user");
-  return user.id;
-};
+const getCurrentUserId = () =>
+  getCloudSaveLocalUserId("Cloud save deletion requires a user");
 
 export const clearCloudSaveLocalState = async (
   objectId: string,
