@@ -6,11 +6,11 @@ Estado do trabalho no branch `feat/self-hosted-cloud-saves` do fork
 
 ## O que já existe
 
-| Commit | O que faz |
-| --- | --- |
-| `38b2047d4` | Cloud save em qualquer remoto rclone (SFTP numa VPS, Google Drive, S3, WebDAV…), sem conta nem assinatura do Hydra. Configuração em **Configurações → Integrações → Saves na sua própria nuvem**. |
+| Commit      | O que faz                                                                                                                                                                                                                                                                           |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `38b2047d4` | Cloud save em qualquer remoto rclone (SFTP numa VPS, Google Drive, S3, WebDAV…), sem conta nem assinatura do Hydra. Configuração em **Configurações → Integrações → Saves na sua própria nuvem**.                                                                                   |
 | `1e44f7355` | Catálogo de ports em **Configurações → Ports para PC**. Primeiro jogo: God of War III Remastered pelo [SpartanPort](https://github.com/FelipePrado0/SpartanPort). Instala da release oficial, valida a pasta do jogo pelo `param.sfo`, adiciona à biblioteca e sincroniza os saves. |
-| `831b19566` | Versão Windows do port (zip), atualização sem sobrescrever o jogo aberto e saves compartilhados entre Windows e Linux. |
+| `831b19566` | Versão Windows do port (zip), atualização sem sobrescrever o jogo aberto e saves compartilhados entre Windows e Linux.                                                                                                                                                              |
 
 ### Onde está o código
 
