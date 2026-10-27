@@ -20,6 +20,7 @@ import {
 } from "@main/services/emulators/emulator-achievement-tracking";
 import { HydraApi } from "@main/services/hydra-api";
 import { CloudSaveRemotes } from "@main/services/cloud-save/remote/cloud-save-remote";
+import { UnlockedAchievementsCache } from "@main/services/achievements/unlocked-achievements-cache";
 import { deleteRetroAchievementsEmulatorAccount } from "@main/services/retro-achievements/retro-achievements-emulator-account";
 import {
   prepareLinuxGameCaptureSession,
@@ -92,6 +93,11 @@ const enableAchievementSouvenirs = async () => {
   await restoreRetroArchAchievementScreenshots();
   await prepareRunningLinuxCaptureSessions();
 };
+
+const ACHIEVEMENT_VIEW_PREFERENCE_KEYS = [
+  "language",
+  "showHiddenAchievementsDescription",
+] as const;
 
 const EMULATOR_ACHIEVEMENT_TRACKING_PREFERENCE_KEYS = [
   "enableAchievementSouvenirs",
@@ -196,6 +202,16 @@ const updateUserPreferences = async (
       valueEncoding: "json",
     }
   );
+
+  if (
+    ACHIEVEMENT_VIEW_PREFERENCE_KEYS.some(
+      (key) =>
+        Object.hasOwn(preferences, key) &&
+        preferences[key] !== userPreferences?.[key]
+    )
+  ) {
+    UnlockedAchievementsCache.clear();
+  }
 
   Wine.syncUserPreferences(updatedPreferences);
   CloudSaveRemotes.syncUserPreferences(updatedPreferences);
