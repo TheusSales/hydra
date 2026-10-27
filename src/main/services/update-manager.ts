@@ -59,6 +59,11 @@ export class UpdateManager {
 
     const isAutoInstallAvailable = await this.isAutoInstallEnabled();
 
+    // Fork builds would otherwise update themselves to the official release.
+    if (import.meta.env.MAIN_VITE_FORK_BUILD === "true") {
+      return false;
+    }
+
     if (app.isPackaged) {
       autoUpdater.autoDownload = isAutoInstallAvailable;
       autoUpdater.checkForUpdates().then((result) => {

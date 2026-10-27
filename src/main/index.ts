@@ -100,7 +100,13 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-if (process.defaultApp) {
+// Fork builds install side by side with the official Hydra, so they leave
+// the hydralauncher:// links to it.
+const isForkBuild = import.meta.env.MAIN_VITE_FORK_BUILD === "true";
+
+if (isForkBuild) {
+  // Keep hydralauncher:// registered to the official app.
+} else if (process.defaultApp) {
   if (process.argv.length >= 2) {
     app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, [
       path.resolve(process.argv[1]),
@@ -112,7 +118,9 @@ if (process.defaultApp) {
 
 const initializeApp = async () => {
   refreshPortableShortcutLauncher();
-  electronApp.setAppUserModelId("gg.hydralauncher.hydra");
+  electronApp.setAppUserModelId(
+    isForkBuild ? "gg.hydralauncher.hydra-fork" : "gg.hydralauncher.hydra"
+  );
 
   logger.info("Crash dumps directory", app.getPath("crashDumps"));
 
