@@ -2,7 +2,7 @@
 
 Estado do trabalho no branch `feat/self-hosted-cloud-saves` do fork
 [TheusSales/hydra](https://github.com/TheusSales/hydra) e o que falta fazer.
-Última atualização: 25/10/2026.
+Última atualização: 28/10/2026.
 
 ## O que já existe
 
@@ -106,6 +106,46 @@ npx electron-vite dev -- --user-data-dir=$HOME/.config/hydralauncher-fork-dev
 
 Para automatizar testes pela janela, adicione `--remoteDebuggingPort 9223`
 antes do `--` e chame `window.electron.*` pelo protocolo do DevTools.
+
+**Gerar e instalar o build do fork (Linux)**, lado a lado com o Hydra oficial.
+Com `MAIN_VITE_FORK_BUILD=true` o app não se atualiza para a versão oficial,
+deixa os links `hydralauncher://` com o oficial e usa a pasta
+`~/.config/hydralauncher-fork` (`%APPDATA%\hydralauncher-fork` no Windows).
+
+`.env` do build:
+
+```bash
+MAIN_VITE_API_URL=https://hydra-api-us-east-1.losbroxas.org
+MAIN_VITE_AUTH_URL=https://auth.hydra.losbroxas.org
+MAIN_VITE_CHECKOUT_URL=https://checkout.hydralauncher.gg
+# Vazio de propósito: definido, o app empacotado carrega a interface
+# remota oficial em vez da interface do fork.
+MAIN_VITE_LAUNCHER_SUBDOMAIN=
+MAIN_VITE_FORK_BUILD=true
+```
+
+O empacotamento compila um `epic-prerequisite-runner.exe` (Rust para
+Windows), que exige `rust-mingw` e `mingw-w64-gcc`. Sem eles, dá para
+reaproveitar o do Hydra oficial instalado quando o código-fonte do runner for
+o mesmo (o script confere o hash):
+
+```bash
+~/.local/bin/hydra.AppImage --appimage-extract 'resources/epic/*'
+mkdir -p binaries/epic-prerequisite-runner/x64
+cp squashfs-root/resources/epic/epic-prerequisite-runner.exe squashfs-root/resources/epic/.build.json binaries/epic-prerequisite-runner/x64/
+```
+
+Build e instalação (só AppImage; `rpm`/`deb` exigem ferramentas extras):
+
+```bash
+npx yarn@1.22.22 build:native
+npx electron-vite build
+npx electron-builder --linux AppImage
+install -m 755 dist/hydralauncher-*.AppImage ~/.local/bin/hydra-fork.AppImage
+```
+
+Crie também um atalho `~/.local/share/applications/hydra-fork.desktop`
+apontando para `~/.local/bin/hydra-fork.AppImage`.
 
 **Testes:**
 

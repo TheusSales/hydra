@@ -8,6 +8,17 @@ const developmentUserDataPath = import.meta.env.MAIN_VITE_USER_DATA_PATH;
 if (!app.isPackaged && developmentUserDataPath) {
   fs.mkdirSync(developmentUserDataPath, { recursive: true, mode: 0o700 });
   app.setPath("userData", developmentUserDataPath);
+} else if (
+  app.isPackaged &&
+  import.meta.env.MAIN_VITE_FORK_BUILD === "true" &&
+  !app.commandLine.hasSwitch("user-data-dir")
+) {
+  // A fork build installed next to the official Hydra keeps its own library,
+  // database and single-instance lock.
+  app.setPath(
+    "userData",
+    path.join(app.getPath("appData"), "hydralauncher-fork")
+  );
 }
 
 export const defaultDownloadsPath = SystemPath.getPath("downloads");
