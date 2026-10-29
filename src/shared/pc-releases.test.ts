@@ -36,6 +36,22 @@ it("matches source ports without catching unrelated executables", () => {
   assert.equal(findPcReleaseByExecutable("D:\\Games\\shooter.exe"), null);
 });
 
+it("matches the PS4 native ports by their launcher or folder", () => {
+  for (const executablePath of [
+    "C:\\Users\\me\\Jogos\\SotC-PC\\Shadow of The Colossus.exe",
+    "C:\\Users\\me\\Jogos\\SotC-PC\\SotC.exe",
+    "C:\\Users\\me\\Jogos\\SotC-PC\\launcher.exe",
+  ]) {
+    assert.equal(findPcReleaseByExecutable(executablePath)?.id, "sotcpc");
+  }
+  assert.equal(
+    findPcReleaseByExecutable("D:\\Ports\\Bloodborne-Windows\\Bloodborne.exe")
+      ?.id,
+    "bloodbornepc"
+  );
+  assert.equal(findPcReleaseByExecutable("D:\\Games\\Sotchi\\game.exe"), null);
+});
+
 it("falls back to the folder name when the executable is generic", () => {
   assert.equal(
     findPcReleaseByExecutable("C:\\Games\\Starfox64Recomp\\launcher.exe")?.id,

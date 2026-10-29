@@ -46,6 +46,7 @@ import { migrateEmulatorCloudSaveDefaults } from "./services/cloud-save/automati
 import { watchSteamLibraries } from "./services/steam-integration/steam-install-watcher";
 import { migrateGameVisibilityFields } from "./services/library-sync/game-visibility-migration";
 import { UmuUpdater } from "./services/umu-updater";
+import { backfillPcReleaseArtwork } from "./services/pc-release-assets";
 
 const hasMissingSeedFiles = async (download: Download): Promise<boolean> => {
   if (!download.folderName) return false;
@@ -130,6 +131,9 @@ export const loadState = async () => {
     await initializeEpicIntegration();
     uploadGamesBatch();
     void migrateDownloadSources();
+    void backfillPcReleaseArtwork().catch((error) =>
+      logger.error("Failed to fill in PC release artwork", error)
+    );
 
     const { syncDownloadSourcesFromApi } = await import("./services/user");
     void syncDownloadSourcesFromApi();

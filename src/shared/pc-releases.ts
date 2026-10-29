@@ -354,6 +354,22 @@ export const PC_RELEASES: readonly PcRelease[] = [
   ),
 
   // Source ports
+  // PS4 native ports built on bloodborne_pc. LaunchBox has no PS4 entries, so
+  // Shadow of the Colossus uses the PS3 release's artwork.
+  port(
+    "sotcpc",
+    "Shadow of the Colossus",
+    "PS4",
+    "15993",
+    /^shadow of the colossus(?:\.exe)?$|^sotc(?:[-_ .]|$)/i
+  ),
+  port(
+    "bloodbornepc",
+    "Bloodborne",
+    "PS4",
+    undefined,
+    /^bloodborne(?:[-_ .]|$)/i
+  ),
   port(
     "shipofharkinian",
     "The Legend of Zelda: Ocarina of Time",
