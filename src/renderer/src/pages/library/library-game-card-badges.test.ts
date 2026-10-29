@@ -12,6 +12,8 @@ import ts from "typescript";
 import * as libraryCategory from "./library-category.ts";
 // @ts-ignore The Node ESM test runner requires the source extension.
 import * as libraryCatalogue from "../../../../shared/library-catalogue.ts";
+// @ts-ignore The Node ESM test runner requires the source extension.
+import * as pcReleases from "../../../../shared/pc-releases.ts";
 
 const requireModule = createRequire(import.meta.url);
 const rendererPath = path.resolve(process.cwd(), "src/renderer/src");
@@ -55,7 +57,7 @@ function renderCard(
       useAnimatedSourceWarmup: () => {},
       useFormat: () => ({ numberFormatter: new Intl.NumberFormat("en") }),
     },
-    "@shared": { getDisplayedPlayTimeInMilliseconds: () => 0 },
+    "@shared": { getDisplayedPlayTimeInMilliseconds: () => 0, ...pcReleases },
     "./library-category": libraryCategory,
     "@renderer/helpers": {
       CLASSICS_PS_PLATFORM_LABELS: {},

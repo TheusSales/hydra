@@ -41,6 +41,19 @@
     object-fit: contain;
   }
 
+  &__release-hint {
+    display: flex;
+    align-items: center;
+    gap: globals.$spacing-unit;
+    margin: 0;
+    font-size: 12px;
+    color: globals.$body-color;
+  }
+
+  &__release-tag {
+    @include globals.pc-release-tag;
+  }
+
   &__actions {
     display: flex;
     justify-content: flex-end;

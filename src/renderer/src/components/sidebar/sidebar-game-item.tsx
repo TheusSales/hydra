@@ -1,7 +1,12 @@
 import SteamLogo from "@renderer/assets/steam-logo.svg?react";
 import EpicLogo from "@renderer/assets/epic-integration-logo.svg?react";
 import { LibraryGame } from "@types";
-import { getGameCatalogueIdentity, getLibraryOperationalGame } from "@shared";
+import {
+  getGameCatalogueIdentity,
+  getLibraryOperationalGame,
+  pcReleaseTagLabel,
+  resolvePcRelease,
+} from "@shared";
 import cn from "classnames";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -66,6 +71,7 @@ export function SidebarGameItem({
   const isCustomGame = game.shop === "custom";
   const catalogueIdentity = getGameCatalogueIdentity(game);
   const badgeSource = getLibraryPresentationBadgeSource(game);
+  const pcRelease = resolvePcRelease(game);
   const sidebarIcon = isCustomGame
     ? game.libraryImageUrl || game.iconUrl
     : game.customIconUrl || game.iconUrl;
@@ -166,6 +172,12 @@ export function SidebarGameItem({
           <span className="sidebar__menu-item-button-label">
             {getGameTitle(game)}
           </span>
+
+          {pcRelease && (
+            <span className="sidebar__game-release-tag">
+              {pcReleaseTagLabel(pcRelease)}
+            </span>
+          )}
 
           {userPreferences?.enableNewDownloadOptionsBadges !== false &&
             (game.newDownloadOptionsCount ?? 0) > 0 && (

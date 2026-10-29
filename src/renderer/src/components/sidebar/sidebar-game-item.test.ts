@@ -13,6 +13,7 @@ import {
   groupLibraryGames,
 } from "../../../../shared/library-catalogue.js";
 import { getLibraryPresentationBadgeSource } from "../../pages/library/library-category.js";
+import * as pcReleases from "../../../../shared/pc-releases.js";
 
 const requireModule = createRequire(import.meta.url);
 const filename = "src/renderer/src/components/sidebar/sidebar-game-item.tsx";
@@ -25,7 +26,11 @@ const { outputText } = ts.transpileModule(fs.readFileSync(filename, "utf8"), {
   fileName: filename,
 });
 const stubs: Record<string, unknown> = {
-  "@shared": { getGameCatalogueIdentity, getLibraryOperationalGame },
+  "@shared": {
+    getGameCatalogueIdentity,
+    getLibraryOperationalGame,
+    ...pcReleases,
+  },
   "@renderer/hooks": {
     useAppSelector: () => ({}),
     useToast: () => ({ showWarningToast: () => {} }),

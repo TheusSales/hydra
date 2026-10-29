@@ -173,6 +173,10 @@
     overflow: hidden;
   }
 
+  &__game-release-tag {
+    @include globals.pc-release-tag;
+  }
+
   &__game-adornments {
     display: flex;
     align-items: center;

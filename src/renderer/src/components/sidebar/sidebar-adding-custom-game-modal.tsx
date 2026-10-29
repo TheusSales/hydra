@@ -9,9 +9,18 @@ import {
   buildGameDetailsPath,
   getGameTitleFromExecutablePath,
 } from "@renderer/helpers";
-import { LINUX_GAME_EXECUTABLE_EXTENSIONS } from "@shared";
+import {
+  LINUX_GAME_EXECUTABLE_EXTENSIONS,
+  findPcReleaseByExecutable,
+  pcReleaseTagLabel,
+} from "@shared";
 
 import "./sidebar-adding-custom-game-modal.scss";
+
+// Recomps and source ports are named after the original game.
+const getDefaultGameTitle = (executablePath: string) =>
+  findPcReleaseByExecutable(executablePath)?.title ??
+  getGameTitleFromExecutablePath(executablePath);
 
 export interface SidebarAddingCustomGameModalProps {
   visible: boolean;
@@ -65,16 +74,18 @@ export function SidebarAddingCustomGameModal({
     if (filePaths && filePaths.length > 0) {
       const selectedPath = filePaths[0];
       const previousTitle = executablePath
-        ? getGameTitleFromExecutablePath(executablePath)
+        ? getDefaultGameTitle(executablePath)
         : "";
 
       setExecutablePath(selectedPath);
 
       if (!gameName.trim() || gameName === previousTitle) {
-        setGameName(getGameTitleFromExecutablePath(selectedPath));
+        setGameName(getDefaultGameTitle(selectedPath));
       }
     }
   };
+
+  const pcRelease = findPcReleaseByExecutable(executablePath);
 
   const handleGameNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setGameName(event.target.value);
@@ -167,6 +178,20 @@ export function SidebarAddingCustomGameModal({
             theme="dark"
             disabled={isAdding}
           />
+
+          {pcRelease && (
+            <p className="sidebar-adding-custom-game-modal__release-hint">
+              <span className="sidebar-adding-custom-game-modal__release-tag">
+                {pcReleaseTagLabel(pcRelease)}
+              </span>
+              {t(
+                pcRelease.launchboxObjectId
+                  ? "custom_game_modal_release_detected"
+                  : "custom_game_modal_release_detected_no_artwork",
+                { title: pcRelease.title }
+              )}
+            </p>
+          )}
         </div>
 
         <div className="sidebar-adding-custom-game-modal__actions">

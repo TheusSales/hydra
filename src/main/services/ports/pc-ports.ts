@@ -10,7 +10,8 @@ import { gamesShopAssetsSublevel, gamesSublevel, levelKeys } from "@main/level";
 import { logger } from "@main/services/logger";
 import { SystemPath } from "@main/services/system-path";
 import { WindowManager } from "@main/services/window-manager";
-import { PC_PORT_PLATFORM, pcPortObjectId } from "@shared";
+import { fetchPcReleaseArtwork } from "@main/services/pc-release-assets";
+import { PC_PORT_PLATFORM, PC_RELEASES, pcPortObjectId } from "@shared";
 import type { Game, PcPortInstallProgress, PcPortSummary } from "@types";
 
 import { validateRestoreManifest } from "../cloud-save/cloud-save-contract";
@@ -352,10 +353,15 @@ export class PcPorts {
     const objectId = pcPortObjectId(portId);
     const key = gameKey(portId);
     const existing = await gamesSublevel.get(key).catch(() => null);
-    const [iconUrl, heroUrl] = await Promise.all([
+    const release = PC_RELEASES.find((entry) => entry.portId === portId);
+    const [iconUrl, heroUrl, releaseArtwork] = await Promise.all([
       copyArtwork(port, gameDir, "icon"),
       copyArtwork(port, gameDir, "hero"),
+      release ? fetchPcReleaseArtwork(release) : null,
     ]);
+    // The dump's own icon and hero win; LaunchBox adds the box art and logo.
+    const coverUrl = releaseArtwork?.coverImageUrl ?? iconUrl ?? "";
+    const logoUrl = releaseArtwork?.logoImageUrl ?? null;
 
     await gamesShopAssetsSublevel.put(key, {
       updatedAt: Date.now(),
@@ -364,10 +370,10 @@ export class PcPorts {
       title: port.title,
       iconUrl,
       libraryHeroImageUrl: heroUrl ?? "",
-      libraryImageUrl: iconUrl ?? "",
-      logoImageUrl: "",
+      libraryImageUrl: coverUrl,
+      logoImageUrl: logoUrl ?? "",
       logoPosition: null,
-      coverImageUrl: iconUrl ?? "",
+      coverImageUrl: coverUrl,
       downloadSources: [],
     });
 
@@ -383,7 +389,7 @@ export class PcPorts {
       }),
       title: port.title,
       iconUrl,
-      logoImageUrl: null,
+      logoImageUrl: logoUrl,
       libraryHeroImageUrl: heroUrl,
       objectId,
       shop: "custom",

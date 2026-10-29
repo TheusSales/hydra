@@ -2,6 +2,8 @@ import { registerEvent } from "../register-event";
 import { gamesSublevel, gamesShopAssetsSublevel, levelKeys } from "@main/level";
 import { randomUUID } from "node:crypto";
 import type { GameShop } from "@types";
+import { findPcReleaseByExecutable } from "@shared";
+import { fetchPcReleaseArtwork } from "@main/services/pc-release-assets";
 
 const addCustomGameToLibrary = async (
   _event: Electron.IpcMainInvokeEvent,
@@ -26,26 +28,37 @@ const addCustomGameToLibrary = async (
     );
   }
 
+  // Recomps and source ports get the original game's artwork from LaunchBox;
+  // images passed by the caller still take precedence.
+  const release = findPcReleaseByExecutable(executablePath);
+  const releaseArtwork = release ? await fetchPcReleaseArtwork(release) : null;
+
+  const resolvedIconUrl = iconUrl || releaseArtwork?.iconUrl || "";
+  const resolvedCoverUrl = iconUrl || releaseArtwork?.coverImageUrl || "";
+  const resolvedLogoUrl = logoImageUrl || releaseArtwork?.logoImageUrl || "";
+  const resolvedHeroUrl =
+    libraryHeroImageUrl || releaseArtwork?.libraryHeroImageUrl || "";
+
   const assets = {
     updatedAt: Date.now(),
     objectId,
     shop,
     title,
-    iconUrl: iconUrl || null,
-    libraryHeroImageUrl: libraryHeroImageUrl || "",
-    libraryImageUrl: iconUrl || "",
-    logoImageUrl: logoImageUrl || "",
+    iconUrl: resolvedIconUrl || null,
+    libraryHeroImageUrl: resolvedHeroUrl,
+    libraryImageUrl: resolvedCoverUrl,
+    logoImageUrl: resolvedLogoUrl,
     logoPosition: null,
-    coverImageUrl: iconUrl || "",
+    coverImageUrl: resolvedCoverUrl,
     downloadSources: [],
   };
   await gamesShopAssetsSublevel.put(gameKey, assets);
 
   const game = {
     title,
-    iconUrl: iconUrl || null,
-    logoImageUrl: logoImageUrl || null,
-    libraryHeroImageUrl: libraryHeroImageUrl || null,
+    iconUrl: resolvedIconUrl || null,
+    logoImageUrl: resolvedLogoUrl || null,
+    libraryHeroImageUrl: resolvedHeroUrl || null,
     objectId,
     shop,
     remoteId: null,

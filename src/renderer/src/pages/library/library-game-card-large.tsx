@@ -16,7 +16,12 @@ import {
 } from "@renderer/helpers";
 import { AchievementProgress, SteamLibraryBadge } from "@renderer/components";
 import { GameVisibilityBadge } from "@renderer/components/game-visibility-badge/game-visibility-badge";
-import { formatBytes, getDisplayedPlayTimeInMilliseconds } from "@shared";
+import {
+  formatBytes,
+  getDisplayedPlayTimeInMilliseconds,
+  pcReleaseTagLabel,
+  resolvePcRelease,
+} from "@shared";
 import {
   ClockIcon,
   AlertFillIcon,
@@ -375,6 +380,10 @@ export const LibraryGameCardLarge = memo(function LibraryGameCardLarge({
       }
     );
 
+  const pcRelease = resolvePcRelease(game);
+  const platformBadgeLabel =
+    classicsPlatformLabel ?? (pcRelease ? pcReleaseTagLabel(pcRelease) : null);
+
   const installedBadge =
     !hideReadySizeBadges && isInstalled ? (
       <InstalledBadge emulatorIcon={classicsEmulatorIcon} />
@@ -476,10 +485,10 @@ export const LibraryGameCardLarge = memo(function LibraryGameCardLarge({
               </div>
             )}
 
-            {!hideClassicsBadges && classicsPlatformLabel && (
+            {!hideClassicsBadges && platformBadgeLabel && (
               <div className="library-game-card-large__classics-badges">
                 <span className="library-game-card-large__platform-badge">
-                  {classicsPlatformLabel}
+                  {platformBadgeLabel}
                 </span>
               </div>
             )}

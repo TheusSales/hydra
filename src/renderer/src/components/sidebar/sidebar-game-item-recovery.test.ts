@@ -7,6 +7,8 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import ts from "typescript";
 import type { LibraryGame } from "@types";
+// @ts-ignore The Node ESM test runner requires the source extension.
+import * as pcReleases from "../../../../shared/pc-releases.ts";
 
 const requireModule = createRequire(import.meta.url);
 const noop = () => {};
@@ -44,6 +46,7 @@ async function setup(t: TestContext) {
     "@shared": {
       getGameCatalogueIdentity: (game: LibraryGame) => game,
       getLibraryOperationalGame: (game: LibraryGame) => game,
+      ...pcReleases,
     },
     "react-router-dom": { useLocation: () => ({ pathname: "" }) },
     "react-i18next": { useTranslation: () => ({ t: (key: string) => key }) },

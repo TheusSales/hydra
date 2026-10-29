@@ -23,7 +23,12 @@ import { CloudSaveWidget } from "./cloud-save-v2";
 import { getCloudSaveVisibility } from "./cloud-save-visibility";
 import { SimilarGames } from "./similar-games/similar-games";
 
-import { AuthPage, getDisplayedPlayTimeInMilliseconds } from "@shared";
+import {
+  AuthPage,
+  getDisplayedPlayTimeInMilliseconds,
+  pcReleaseTagLabel,
+  resolvePcRelease,
+} from "@shared";
 import { cloudSyncContext, gameDetailsContext } from "@renderer/context";
 
 import cloudIconAnimated from "@renderer/assets/icons/cloud-animated.gif";
@@ -290,6 +295,15 @@ export function GameDetailsContent() {
       </div>
     ) : null;
 
+  const pcRelease = game ? resolvePcRelease(game) : null;
+  const pcReleaseChips = pcRelease ? (
+    <div className="game-details__hero-classics-chips">
+      <span className="game-details__hero-classics-chip">
+        {pcReleaseTagLabel(pcRelease)}
+      </span>
+    </div>
+  ) : null;
+
   const heroImageContent = resolvedHeroImage ? (
     <img
       src={resolvedHeroImage}
@@ -426,6 +440,7 @@ export function GameDetailsContent() {
                     shopDetails={shopDetails}
                   />
                   {classicsChips}
+                  {pcReleaseChips}
                 </div>
               )}
 

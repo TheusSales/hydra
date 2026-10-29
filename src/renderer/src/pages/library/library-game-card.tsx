@@ -1,5 +1,9 @@
 import { LibraryGame } from "@types";
-import { getDisplayedPlayTimeInMilliseconds } from "@shared";
+import {
+  getDisplayedPlayTimeInMilliseconds,
+  pcReleaseTagLabel,
+  resolvePcRelease,
+} from "@shared";
 import cn from "classnames";
 import { getLibraryPresentationImportSources } from "./library-category";
 import {
@@ -144,8 +148,11 @@ export const LibraryGameCard = memo(function LibraryGameCard({
       }
     );
 
-  const showPlatformBadge =
-    !hideClassicsBadges && Boolean(classicsPlatformLabel);
+  const pcRelease = resolvePcRelease(game);
+  const platformBadgeLabel =
+    classicsPlatformLabel ?? (pcRelease ? pcReleaseTagLabel(pcRelease) : null);
+
+  const showPlatformBadge = !hideClassicsBadges && Boolean(platformBadgeLabel);
   const showReadyBadge = !hideReadySizeBadges && isInstalled;
 
   const handleImageError = () => {
@@ -290,7 +297,7 @@ export const LibraryGameCard = memo(function LibraryGameCard({
               {showPlatformBadge && (
                 <div className="library-game-card__classics-badges">
                   <span className="library-game-card__platform-badge">
-                    {classicsPlatformLabel}
+                    {platformBadgeLabel}
                   </span>
                 </div>
               )}
