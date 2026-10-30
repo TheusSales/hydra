@@ -57,6 +57,9 @@ import type {
   EmulatorInstallProgress,
   PcPortInstallProgress,
   PcPortSummary,
+  PcReleaseCatalogEntry,
+  PcReleaseUpdateProgress,
+  PcReleaseUpdateStatus,
   EmulatorInstallResult,
   ResolvedInstallOption,
   DetectedRom,
@@ -781,6 +784,24 @@ declare global {
     ) => Promise<{ ok: true } | { ok: false; error: string }>;
     onPcPortInstallProgress: (
       cb: (payload: PcPortInstallProgress) => void
+    ) => () => void;
+    /* Recomp and port updates */
+    listPcReleaseCatalog: () => Promise<PcReleaseCatalogEntry[]>;
+    getPcReleaseUpdateStatus: (
+      shop: GameShop,
+      objectId: string,
+      force?: boolean
+    ) => Promise<PcReleaseUpdateStatus | null>;
+    updatePcRelease: (
+      shop: GameShop,
+      objectId: string
+    ) => Promise<{ ok: true; value: string } | { ok: false; error: string }>;
+    restorePcReleaseBackup: (
+      shop: GameShop,
+      objectId: string
+    ) => Promise<{ ok: true } | { ok: false; error: string }>;
+    onPcReleaseUpdateProgress: (
+      cb: (payload: PcReleaseUpdateProgress) => void
     ) => () => void;
     /* RetroArch */
     getRetroArchConfig: () => Promise<RetroArchConfig>;

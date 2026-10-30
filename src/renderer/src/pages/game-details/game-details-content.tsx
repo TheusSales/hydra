@@ -11,6 +11,7 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 
 import { HeroPanel } from "./hero";
+import { PcReleaseUpdate } from "./pc-release-update";
 import { DescriptionHeader } from "./description-header/description-header";
 import { GallerySlider } from "./gallery-slider/gallery-slider";
 import { Sidebar } from "./sidebar/sidebar";
@@ -296,13 +297,19 @@ export function GameDetailsContent() {
     ) : null;
 
   const pcRelease = game ? resolvePcRelease(game) : null;
-  const pcReleaseChips = pcRelease ? (
-    <div className="game-details__hero-classics-chips">
-      <span className="game-details__hero-classics-chip">
-        {pcReleaseTagLabel(pcRelease)}
-      </span>
-    </div>
-  ) : null;
+  const pcReleaseChips =
+    game && pcRelease ? (
+      <div className="game-details__hero-classics-chips">
+        <span className="game-details__hero-classics-chip">
+          {pcReleaseTagLabel(pcRelease)}
+        </span>
+        <PcReleaseUpdate
+          shop={game.shop}
+          objectId={game.objectId}
+          title={game.title}
+        />
+      </div>
+    ) : null;
 
   const heroImageContent = resolvedHeroImage ? (
     <img

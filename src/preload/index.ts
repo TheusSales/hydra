@@ -33,6 +33,9 @@ import type {
   EmulatorInstallProgress,
   PcPortInstallProgress,
   PcPortSummary,
+  PcReleaseCatalogEntry,
+  PcReleaseUpdateProgress,
+  PcReleaseUpdateStatus,
   RetroArchCoreName,
   RetroArchCoreInstallProgress,
   RetroArchInstallProgress,
@@ -656,6 +659,39 @@ contextBridge.exposeInMainWorld("electron", {
     ipcRenderer.on("on-pc-port-install-progress", listener);
     return () =>
       ipcRenderer.removeListener("on-pc-port-install-progress", listener);
+  },
+  /* Recomp and port updates */
+  listPcReleaseCatalog: () =>
+    ipcRenderer.invoke("listPcReleaseCatalog") as Promise<
+      PcReleaseCatalogEntry[]
+    >,
+  getPcReleaseUpdateStatus: (
+    shop: GameShop,
+    objectId: string,
+    force?: boolean
+  ) =>
+    ipcRenderer.invoke(
+      "getPcReleaseUpdateStatus",
+      shop,
+      objectId,
+      force
+    ) as Promise<PcReleaseUpdateStatus | null>,
+  updatePcRelease: (shop: GameShop, objectId: string) =>
+    ipcRenderer.invoke("updatePcRelease", shop, objectId) as Promise<
+      { ok: true; value: string } | { ok: false; error: string }
+    >,
+  restorePcReleaseBackup: (shop: GameShop, objectId: string) =>
+    ipcRenderer.invoke("restorePcReleaseBackup", shop, objectId) as Promise<
+      { ok: true } | { ok: false; error: string }
+    >,
+  onPcReleaseUpdateProgress: (
+    cb: (payload: PcReleaseUpdateProgress) => void
+  ) => {
+    const listener = (_event: unknown, payload: PcReleaseUpdateProgress) =>
+      cb(payload);
+    ipcRenderer.on("on-pc-release-update-progress", listener);
+    return () =>
+      ipcRenderer.removeListener("on-pc-release-update-progress", listener);
   },
   /* RetroArch */
   getRetroArchConfig: () => ipcRenderer.invoke("getRetroArchConfig"),

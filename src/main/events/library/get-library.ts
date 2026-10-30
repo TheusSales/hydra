@@ -17,6 +17,7 @@ import {
 } from "@main/level";
 import { composeAssetsWithArtwork } from "@shared";
 import { HydraApi } from "@main/services/hydra-api";
+import { isPcReleaseUpdateAvailable } from "@main/services/pc-release-updates";
 import { belongsToLibraryCollection } from "@main/services/library-sync/game-visibility";
 import {
   resolveAchievementCount,
@@ -182,6 +183,7 @@ const getLibrary = async (
               customLogoImageUrl: game.customLogoImageUrl,
               customHeroImageUrl: game.customHeroImageUrl,
               customCoverImageUrl: game.customCoverImageUrl,
+              pcReleaseUpdateAvailable: isPcReleaseUpdateAvailable(key),
             };
           })
       ).then((games) => {

@@ -898,6 +898,8 @@ export type LibraryGame = Game &
     download: Download | null;
     unlockedAchievementCount?: number;
     achievementCount?: number;
+    /** A newer GitHub release of this recomp or port can be installed. */
+    pcReleaseUpdateAvailable?: boolean;
   };
 
 /** Read-only catalogue projection; writes must use its original members. */

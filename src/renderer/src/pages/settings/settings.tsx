@@ -17,7 +17,7 @@ import {
   VideoIcon,
   ShieldCheckIcon,
 } from "@primer/octicons-react";
-import { Cpu, Gamepad2, Wrench } from "lucide-react";
+import { Cpu, Gamepad2, Layers, Wrench } from "lucide-react";
 import { SettingsContextGeneral } from "./settings-context-general";
 import { SettingsContextDownloads } from "./settings-context-downloads";
 import { SettingsContextDownloadSources } from "./settings-context-download-sources";
@@ -28,6 +28,7 @@ import { SettingsContextCompatibility } from "./settings-context-compatibility";
 import { SettingsContextBigPicture } from "./settings-context-big-picture";
 import { SettingsContextEmulation } from "./emulation/settings-context-emulation";
 import { SettingsContextPcPorts } from "./pc-ports/settings-context-pc-ports";
+import { SettingsContextPcReleases } from "./pc-releases/settings-context-pc-releases";
 
 export default function Settings() {
   const { t } = useTranslation("settings");
@@ -97,6 +98,12 @@ export default function Settings() {
         icon: <Cpu size={16} />,
         group: "classics" as const,
       },
+      {
+        id: "pc_releases" as const,
+        label: t("pc_releases"),
+        icon: <Layers size={16} />,
+        group: "classics" as const,
+      },
     ],
     [t, userDetails]
   );
@@ -149,6 +156,10 @@ export default function Settings() {
 
             if (selectedCategoryId === "pc_ports") {
               return <SettingsContextPcPorts />;
+            }
+
+            if (selectedCategoryId === "pc_releases") {
+              return <SettingsContextPcReleases />;
             }
 
             return <SettingsAccount />;

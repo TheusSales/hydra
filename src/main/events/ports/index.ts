@@ -3,6 +3,7 @@ import { logger } from "@main/services/logger";
 import { WindowManager } from "@main/services/window-manager";
 
 import { registerEvent } from "../register-event";
+import "./pc-release-updates";
 
 type PcPortResult<T = undefined> =
   | ({ ok: true } & (T extends undefined ? object : { value: T }))

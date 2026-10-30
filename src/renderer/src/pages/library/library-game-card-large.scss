@@ -308,6 +308,16 @@
     min-width: 0;
   }
 
+  // A newer release of this recomp or port is available.
+  &__update-dot {
+    width: 6px;
+    height: 6px;
+    margin-left: 6px;
+    border-radius: 50%;
+    background-color: globals.$brand-teal;
+    box-shadow: 0 0 0 2px rgba(22, 177, 149, 0.25);
+  }
+
   &__platform-badge {
     border: 1px solid transparent;
     border-radius: 6px;

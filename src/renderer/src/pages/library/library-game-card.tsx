@@ -298,6 +298,13 @@ export const LibraryGameCard = memo(function LibraryGameCard({
                 <div className="library-game-card__classics-badges">
                   <span className="library-game-card__platform-badge">
                     {platformBadgeLabel}
+                    {game.pcReleaseUpdateAvailable && (
+                      <span
+                        className="library-game-card__update-dot"
+                        title={t("pc_release_update_badge")}
+                        aria-label={t("pc_release_update_badge")}
+                      />
+                    )}
                   </span>
                 </div>
               )}

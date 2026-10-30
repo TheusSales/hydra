@@ -91,14 +91,6 @@ export const PC_RELEASES: readonly PcRelease[] = [
     "1120",
     /goemon64recomp/i
   ),
-  recomp("drmario64recomp", "Dr. Mario 64", "N64", "1059", /drmario64recomp/i),
-  recomp(
-    "dnzhrecomp",
-    "Duke Nukem: Zero Hour",
-    "N64",
-    "1061",
-    /dnzhrecomp|zerohourrecomp/i
-  ),
   recomp(
     "mariokart64recomp",
     "Mario Kart 64",
@@ -400,6 +392,66 @@ export const PC_RELEASES: readonly PcRelease[] = [
     "spartanport"
   ),
 ];
+
+/**
+ * GitHub repository of each project, linked from the catalog. Super Mario 64
+ * has many competing ports, so it links to none.
+ */
+export const PC_RELEASE_REPOSITORIES: Readonly<Record<string, string>> = {
+  zelda64recomp: "Zelda64Recomp/Zelda64Recomp",
+  starfox64recomp: "sonicdcer/Starfox64Recomp",
+  banjorecomp: "BanjoRecomp/BanjoRecomp",
+  goemon64recomp: "klorfmorf/Goemon64Recomp",
+  mariokart64recomp: "sonicdcer/MarioKart64Recomp",
+  goldeneyerecomp: "SunJaycy/GoldenEye-Recomp",
+  dk64recomp: "Rainchus/Donkey-Kong-64-Recompiled",
+  conkerrecomp: "sciaschi/CBFD-Recompiled",
+  bm64recomp: "RevoSucks/BM64Recomp",
+  megaman64recomp: "MegaMan64Recomp/MegaMan64Recompiled",
+  harvestmoon64recomp: "HarvestMoon64Recomp/HarvestMoon64Recomp",
+  dinosaurplanetrecomp: "DinosaurPlanetRecomp/dino-recomp",
+  unleashedrecomp: "hedge-dev/UnleashedRecomp",
+  marathonrecomp: "sonicnext-dev/MarathonRecomp",
+  skate3recomp: "mchughalex/skate3recomp",
+  dantesinferno: "florinp93/hells-gate-recomp",
+  edgeoftimerecomp: "goliathret/EdgeOfTimeRecomp",
+  restreet: "samuelit0davila/fifa-street-pc-port",
+  nocturnerecomp: "birabittoh/NocturneRecomp",
+  simpsonsgamerecomp: "YesterMester/TheSimpsonsGameRecomp",
+  condemned2recomp: "psxrestore/Condemned2Recomp",
+  xerenge: "shipa-2/Xerenge",
+  kingkongrecomp: "TekRantGaming/king-kong-recompiled",
+  budokai3hd: "novapowers0/DBZ-Budokai-3-HD-Collection",
+  ttt2: "shihabal3amri/tekken-tag-tournament-2-pc",
+  nfsmwrecomp: "madelrandel-blip/NFSMW-Recompiled",
+  dprecomp: "LittleBitUA/DPRecomp",
+  eternalsonata: "birabittoh/EternalSonataReprise",
+  pinyonshift: "arcanite24/pinyon-shift",
+  fh1reimagined: "FH1-ReImagined/ForzaHorizon1-ReImagined",
+  lostodysseyrecomp: "freefrank/LostOdysseyRecomp",
+  fable2recomp: "himdo/Fable-2-Recomp",
+  retip: "SolarCookies/TiP-Recomp",
+  renut: "masterspike52/reNut",
+  narutoriserecomp: "jorjbarbosa/naruto-rise-recomp",
+  doaxbv: "NoRain211/doaxvb-re",
+  finesthour: "crazyriddler/FinestHourRemastered",
+  medievilrecomp: "BlackLabelHQ/MediEvilRecomp",
+  driveclubrecomp: "OverkillLabs3/driveclub-recomp",
+  luigismansionrecomp: "rob646464/luigis-mansion-recompiled",
+  eternaldarknessrecomp: "griches/EternalDarknessRecomp",
+  skyrecomp: "Apolinario-coder/SkyRecomp",
+  brawlrecomp: "josiahg2502-glitch/BrawlRecompiled",
+  botwnative: "ryderclanky/BotW-Native",
+  dkc1recomp: "elliotttate/DKC1Recomp",
+  megamanxrecomp: "mstan/MegaManXSNESRecomp",
+  totkrecomp: "valentderah/totk-pc-recomp",
+  letsgorecomp: "raulzrrs/letsgo-recomp",
+  sotcpc: "AjncSystem/ShadowOfTheColossus-PC",
+  bloodbornepc: "Supermedo/bloodborne_pc",
+  shipofharkinian: "HarbourMasters/Shipwright",
+  "2ship2harkinian": "HarbourMasters/2ship2harkinian",
+  spartanport: "FelipePrado0/SpartanPort",
+};
 
 const pathSegments = (executablePath: string) =>
   executablePath.split(/[\\/]+/).filter(Boolean);

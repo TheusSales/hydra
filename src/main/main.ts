@@ -47,6 +47,7 @@ import { watchSteamLibraries } from "./services/steam-integration/steam-install-
 import { migrateGameVisibilityFields } from "./services/library-sync/game-visibility-migration";
 import { UmuUpdater } from "./services/umu-updater";
 import { backfillPcReleaseArtwork } from "./services/pc-release-assets";
+import { refreshPcReleaseUpdates } from "./services/pc-release-updates";
 
 const hasMissingSeedFiles = async (download: Download): Promise<boolean> => {
   if (!download.folderName) return false;
@@ -133,6 +134,9 @@ export const loadState = async () => {
     void migrateDownloadSources();
     void backfillPcReleaseArtwork().catch((error) =>
       logger.error("Failed to fill in PC release artwork", error)
+    );
+    void refreshPcReleaseUpdates().catch((error) =>
+      logger.error("Failed to check for recomp and port updates", error)
     );
 
     const { syncDownloadSourcesFromApi } = await import("./services/user");
